@@ -108,14 +108,11 @@ class TestTextToSpeech(unittest.TestCase):
         tts = TextToSpeech()
         # Test that set_volume doesn't raise an exception
         # Note: Some TTS engines (like eSpeak) may not support volume changes
-        try:
-            tts.set_volume(0.5)
-            volume = tts.engine.getProperty('volume')
-            # Volume should be between 0 and 1
-            self.assertGreaterEqual(volume, 0.0)
-            self.assertLessEqual(volume, 1.0)
-        except Exception as e:
-            self.fail(f"set_volume raised exception: {e}")
+        tts.set_volume(0.5)
+        volume = tts.engine.getProperty('volume')
+        # Volume should be between 0 and 1
+        self.assertGreaterEqual(volume, 0.0)
+        self.assertLessEqual(volume, 1.0)
 
 
 if __name__ == '__main__':

@@ -78,7 +78,7 @@ class SpeechToText:
         Get information about supported languages.
         
         Returns:
-            str: Information about language support
+            str: Formatted string with information about common language codes
         """
         return """
         Common language codes:
