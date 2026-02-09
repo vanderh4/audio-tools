@@ -1,0 +1,37 @@
+services:
+  speaches:
+    image: ghcr.io/speaches-ai/speaches:latest-cuda-12.6.3
+    container_name: speaches_service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - speaches_cache:/home/ubuntu/.cache/huggingface/hub
+    environment:
+      # Log nível debug para facilitar os primeiros testes
+      - LOG_LEVEL=info
+      # Preload baixa os modelos no primeiro boot para garantir suporte PT/EN
+      # STT: Whisper Base (equilibrado) | TTS: Kokoro (Alta qualidade)
+      - PRELOAD_MODELS=Systran/faster-whisper-large-v3,speaches-ai/Kokoro-82M-v1.0-ONNX-int8
+      # Otimização para CUDA/GPU - float16 oferece melhor desempenho com qualidade
+      - WHISPER__COMPUTE_TYPE=float16
+      # Habilitar CUDA para melhor performance
+      - CUDA_VISIBLE_DEVICES=0
+      # Tempo para descarregar modelos da memória (em segundos). -1 mantém sempre carregado.
+      - STT_MODEL_TTL=300
+      - TTS_MODEL_TTL=300
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  speaches_cache:
